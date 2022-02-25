@@ -22,20 +22,26 @@ func NewUser(logger *zap.Logger, collection *mongo.Collection) User {
 	return &user
 }
 
-func (user *user_impl) Insert(ctx context.Context, data *Data) error {
-	user.logger.Info("inserting", zap.Any("data", data))
+func (user *user_impl) Register(ctx context.Context, registerData RegisterData) error {
+	user.logger.Info("register", zap.Any("data", registerData))
 
-	data.Password = hash([]byte(data.Password))
+	if registerData.Password != registerData.ConfirmPassword {
+		return ErrorPassworNotMatch
+	}
 
-	result, err := user.collection.InsertOne(ctx, data)
+	userData := Data{
+		Username: registerData.Username,
+		Password: hash([]byte(registerData.Password)),
+	}
+
+	result, err := user.collection.InsertOne(ctx, userData)
 	if err != nil {
 		return err
 	}
 	if id, ok := result.InsertedID.(primitive.ObjectID); ok {
-		data.ID = id
+		userData.ID = id
 	}
 
-	user.logger.Debug("inserted", zap.Any("data", data))
-
+	user.logger.Debug("registered", zap.Any("data", userData))
 	return nil
 }

@@ -2,12 +2,23 @@ package user
 
 import (
 	"context"
+	"errors"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+var (
+	ErrorPassworNotMatch = errors.New("password does not match")
+)
+
 type User interface {
-	Insert(ctx context.Context, data *Data) error
+	Register(ctx context.Context, data RegisterData) error
+}
+
+type RegisterData struct {
+	Username        string
+	Password        string
+	ConfirmPassword string
 }
 
 type Data struct {
