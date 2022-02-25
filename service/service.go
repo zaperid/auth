@@ -28,12 +28,10 @@ func NewService(logger *zap.Logger) Service {
 func (service *service_impl) Connect(ctx context.Context, host string, database string) error {
 	var err error
 
-	service.logger = service.logger.With(
+	service.logger.Info("connecting",
 		zap.String("host", host),
 		zap.String("database", database),
 	)
-
-	service.logger.Info("connecting")
 
 	service.client, err = mongo.Connect(ctx, options.Client().ApplyURI(host))
 	if err != nil {
