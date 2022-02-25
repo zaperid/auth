@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"montrek-api/service/user"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -56,4 +57,19 @@ func (service *service_impl) Disconnect(ctx context.Context) error {
 
 	service.logger.Info("disconnected")
 	return nil
+}
+
+func (service *service_impl) User() (user.User, error) {
+	if service.db == nil {
+		return nil, ErrorDisconnected
+	}
+
+	userCollection := service.db.Collection("user")
+	if userCollection == nil {
+		return nil, ErrorDisconnected
+	}
+
+	user := user.NewUser(service.logger, userCollection)
+
+	return user, nil
 }
