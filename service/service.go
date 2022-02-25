@@ -52,6 +52,8 @@ func (service *service_impl) Disconnect(ctx context.Context) error {
 		return err
 	}
 
+	service.db = nil
+
 	service.logger.Info("disconnected")
 	return nil
 }
