@@ -18,12 +18,12 @@ func TestConnection(t *testing.T) {
 
 	service := service.NewService(nil)
 	err := service.Connect(ctx, host, database)
-	if assert.Nil(t, err) {
+	if !assert.Nil(t, err) {
 		return
 	}
 
 	err = service.Disconnect(ctx)
-	if assert.Nil(t, err) {
+	if !assert.Nil(t, err) {
 		return
 	}
 }
