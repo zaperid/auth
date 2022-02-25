@@ -25,6 +25,8 @@ func NewUser(logger *zap.Logger, collection *mongo.Collection) User {
 func (user *user_impl) Insert(ctx context.Context, data *Data) error {
 	user.logger.Info("inserting", zap.Any("data", data))
 
+	data.Password = hash([]byte(data.Password))
+
 	result, err := user.collection.InsertOne(ctx, data)
 	if err != nil {
 		return err
