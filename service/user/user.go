@@ -41,8 +41,9 @@ func (user *user_impl) Register(ctx context.Context, registerData RegisterData) 
 
 	userData := Data{
 		Username: registerData.Username,
-		Password: hash([]byte(registerData.Password)),
+		Password: registerData.Password,
 	}
+	processUser(&userData)
 
 	result, err := user.collection.InsertOne(ctx, userData)
 	if err != nil {
@@ -61,8 +62,9 @@ func (user *user_impl) Find(ctx context.Context, findData FindData) (Data, error
 
 	userData := Data{
 		Username: findData.Username,
-		Password: hash([]byte(findData.Password)),
+		Password: findData.Password,
 	}
+	processUser(&userData)
 
 	result := user.collection.FindOne(ctx, userData)
 	if result.Err() == mongo.ErrNoDocuments {
@@ -88,6 +90,7 @@ func (user *user_impl) UsedUsername(ctx context.Context, username string) (bool,
 	data := Data{
 		Username: username,
 	}
+	processUser(&data)
 
 	limit := int64(1)
 
