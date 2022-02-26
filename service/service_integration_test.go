@@ -4,7 +4,7 @@ package service_test
 
 import (
 	"context"
-	"montrek-api/service"
+	"montrek-auth/service"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

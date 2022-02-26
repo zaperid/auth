@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"montrek-api/service/user"
+	"montrek-auth/service/user"
 )
 
 var (

@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"montrek-api/service/user"
+	"montrek-auth/service/user"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

@@ -1,4 +1,4 @@
-module montrek-api
+module montrek-auth
 
 go 1.17
 
