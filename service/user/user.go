@@ -46,12 +46,12 @@ func (user *user_impl) Register(ctx context.Context, registerData RegisterData) 
 	return nil
 }
 
-func (user *user_impl) Find(ctx context.Context, loginData FindData) (Data, error) {
-	user.logger.Info("finding", zap.Any("data", loginData))
+func (user *user_impl) Find(ctx context.Context, findData FindData) (Data, error) {
+	user.logger.Info("finding", zap.Any("data", findData))
 
 	userData := Data{
-		Username: loginData.Username,
-		Password: hash([]byte(loginData.Password)),
+		Username: findData.Username,
+		Password: hash([]byte(findData.Password)),
 	}
 
 	result := user.collection.FindOne(ctx, userData)
