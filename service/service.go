@@ -2,74 +2,90 @@ package service
 
 import (
 	"context"
-	"montrek-auth/service/user"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.uber.org/zap"
+	"montrek-auth/service/database"
+	"montrek-auth/service/hash"
+	"time"
 )
 
 type service_impl struct {
-	logger *zap.Logger
-	client *mongo.Client
-	db     *mongo.Database
+	config  Config
+	db      database.Database
+	timeout time.Duration
 }
 
-func NewService(logger *zap.Logger) Service {
-	if logger == nil {
-		logger = zap.NewNop()
+func NewService(config Config) (Service, error) {
+	dbConfig := database.Config{
+		Logger:     config.Logger,
+		Host:       config.DatabaseHost,
+		Database:   config.DatabaseName,
+		Collection: "user",
 	}
 
 	service := service_impl{
-		logger: logger,
+		config:  config,
+		db:      database.NewDatabase(dbConfig),
+		timeout: 30 * time.Second,
 	}
-	return &service
+
+	ctx, ctxCancel := context.WithTimeout(context.Background(), service.timeout)
+	err := service.db.Connect(ctx)
+	ctxCancel()
+	if err != nil {
+		return nil, err
+	}
+
+	return &service, nil
 }
 
-func (service *service_impl) Connect(ctx context.Context, host string, database string) error {
-	var err error
-
-	service.logger.Info("connecting",
-		zap.String("host", host),
-		zap.String("database", database),
-	)
-
-	service.client, err = mongo.Connect(ctx, options.Client().ApplyURI(host))
+func (service *service_impl) Close() error {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), service.timeout)
+	err := service.db.Disconnect(ctx)
+	ctxCancel()
 	if err != nil {
 		return err
 	}
 
-	service.db = service.client.Database(database)
-
-	service.logger.Info("connected")
 	return nil
 }
 
-func (service *service_impl) Disconnect(ctx context.Context) error {
-	service.logger.Info("disconnecting")
+func (service *service_impl) Register(ctx context.Context, username string, password string, passwordConfirm string) error {
+	if password != passwordConfirm {
+		return ErrPassNotConfirm
+	}
 
-	err := service.client.Disconnect(ctx)
+	used, err := service.UsedUsername(ctx, username)
+	if err != nil {
+		return err
+	}
+	if used {
+		return ErrUsernamedUsed
+	}
+
+	data := database.Data{
+		Username: username,
+		Password: hash.Hash([]byte(password)),
+	}
+
+	err = service.db.Insert(ctx, &data)
 	if err != nil {
 		return err
 	}
 
-	service.db = nil
-
-	service.logger.Info("disconnected")
 	return nil
 }
 
-func (service *service_impl) User() (user.User, error) {
-	if service.db == nil {
-		return nil, ErrorDisconnected
+func (service *service_impl) UsedUsername(ctx context.Context, username string) (bool, error) {
+	data := database.Data{
+		Username: username,
 	}
 
-	userCollection := service.db.Collection("user")
-	if userCollection == nil {
-		return nil, ErrorDisconnected
+	err := service.db.Find(ctx, &data)
+	if err != database.ErrorNotFound {
+		return true, nil
+	}
+	if err != nil {
+		return false, err
 	}
 
-	user := user.NewUser(service.logger, userCollection)
-
-	return user, nil
+	return false, nil
 }

@@ -3,15 +3,22 @@ package service
 import (
 	"context"
 	"errors"
-	"montrek-auth/service/user"
+
+	"go.uber.org/zap"
 )
 
 var (
-	ErrorDisconnected = errors.New("service disconnected")
+	ErrPassNotConfirm = errors.New("password not confirm")
+	ErrUsernamedUsed  = errors.New("username already been used")
 )
 
 type Service interface {
-	Connect(ctx context.Context, host string, database string) error
-	Disconnect(ctx context.Context) error
-	User() (user.User, error)
+	Close() error
+	Register(ctx context.Context, username string, password string, passwordConfirm string) error
+}
+
+type Config struct {
+	Logger       *zap.Logger
+	DatabaseHost string
+	DatabaseName string
 }
