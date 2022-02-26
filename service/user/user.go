@@ -45,3 +45,26 @@ func (user *user_impl) Register(ctx context.Context, registerData RegisterData) 
 	user.logger.Debug("registered", zap.Any("data", userData))
 	return nil
 }
+
+func (user *user_impl) Find(ctx context.Context, loginData FindData) (Data, error) {
+	user.logger.Info("finding", zap.Any("data", loginData))
+
+	userData := Data{
+		Username: loginData.Username,
+		Password: hash([]byte(loginData.Password)),
+	}
+
+	result := user.collection.FindOne(ctx, userData)
+	if result.Err() == mongo.ErrNoDocuments {
+		return Data{}, ErrorNotFound
+	}
+
+	err := result.Decode(&userData)
+	if err != nil {
+		return Data{}, err
+	}
+
+	user.logger.Info("found", zap.Any("data", userData))
+
+	return userData, nil
+}
