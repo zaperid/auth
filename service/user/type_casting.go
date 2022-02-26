@@ -15,6 +15,7 @@ var (
 type User interface {
 	Register(ctx context.Context, data RegisterData) error
 	Find(ctx context.Context, data FindData) (Data, error)
+	UsedUsername(ctx context.Context, username string) (bool, error)
 }
 
 type RegisterData struct {
@@ -30,6 +31,6 @@ type FindData struct {
 
 type Data struct {
 	ID       primitive.ObjectID `bson:"_id,omitempty"`
-	Username string             `bson:"username"`
-	Password string             `bson:"password"`
+	Username string             `bson:"username,omitempty"`
+	Password string             `bson:"password,omitempty"`
 }

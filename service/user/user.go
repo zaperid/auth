@@ -5,6 +5,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 )
 
@@ -67,4 +68,27 @@ func (user *user_impl) Find(ctx context.Context, findData FindData) (Data, error
 	user.logger.Info("found", zap.Any("data", userData))
 
 	return userData, nil
+}
+
+func (user *user_impl) UsedUsername(ctx context.Context, username string) (bool, error) {
+	logger := user.logger.With(zap.String("username", username))
+	logger.Info("checking username")
+
+	var used bool
+
+	data := Data{
+		Username: username,
+	}
+
+	limit := int64(1)
+
+	n, err := user.collection.CountDocuments(ctx, data, &options.CountOptions{Limit: &limit})
+	if err != nil {
+		return false, err
+	}
+
+	used = (n == 1)
+
+	logger.Info("username checked", zap.Bool("used", used))
+	return used, nil
 }
