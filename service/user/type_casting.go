@@ -10,6 +10,7 @@ import (
 var (
 	ErrorPassworNotMatch = errors.New("password does not match")
 	ErrorNotFound        = errors.New("data not found")
+	ErrorUsernameUsed    = errors.New("username already been used")
 )
 
 type User interface {

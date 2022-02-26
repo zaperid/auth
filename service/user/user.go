@@ -26,6 +26,15 @@ func NewUser(logger *zap.Logger, collection *mongo.Collection) User {
 func (user *user_impl) Register(ctx context.Context, registerData RegisterData) error {
 	user.logger.Info("register", zap.Any("data", registerData))
 
+	used, err := user.UsedUsername(ctx, registerData.Username)
+	if err != nil {
+		return err
+	}
+
+	if used {
+		return ErrorUsernameUsed
+	}
+
 	if registerData.Password != registerData.ConfirmPassword {
 		return ErrorPassworNotMatch
 	}
