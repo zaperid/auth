@@ -5,6 +5,7 @@ import (
 	"montrek-auth/service/captcha"
 	"montrek-auth/service/database"
 	"montrek-auth/service/hash"
+	"montrek-auth/service/jwt"
 	"time"
 )
 
@@ -12,6 +13,7 @@ type service_impl struct {
 	config  Config
 	db      database.Database
 	captcha captcha.Captcha
+	jwt     jwt.JWT
 	timeout time.Duration
 }
 
@@ -30,11 +32,18 @@ func NewService(config Config) (Service, error) {
 		NoiseCount: config.CaptchaNoiseCount,
 	}
 
+	jwtConfig := jwt.Config{
+		Logger:   config.Logger,
+		Key:      config.Key,
+		Lifetime: config.JWTLifetime,
+	}
+
 	service := service_impl{
 		config:  config,
 		db:      database.NewDatabase(dbConfig),
-		timeout: 30 * time.Second,
 		captcha: captcha.NewCaptcha(captchaConfig),
+		jwt:     jwt.NewJwt(jwtConfig),
+		timeout: 30 * time.Second,
 	}
 
 	ctx, ctxCancel := context.WithTimeout(context.Background(), service.timeout)
@@ -106,4 +115,30 @@ func (service *service_impl) UsedUsername(ctx context.Context, username string) 
 	}
 
 	return false, nil
+}
+
+func (service *service_impl) Login(ctx context.Context, captchaToken string, answer string, username string, password string) (string, error) {
+	if !service.captcha.Verify(captchaToken, answer) {
+		return "", ErrCaptchaInvalid
+	}
+
+	data := database.Data{
+		Username: username,
+	}
+
+	err := service.db.Find(ctx, &data)
+	if err != nil {
+		return "", err
+	}
+
+	jwtData := jwt.Data{
+		ID: data.ID.String(),
+	}
+
+	tokenStr, err := service.jwt.Generate(jwtData)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenStr, nil
 }
