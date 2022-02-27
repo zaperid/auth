@@ -20,7 +20,8 @@ func NewJwt(config Config) JWT {
 }
 
 func (jwtWrapper *jwt_impl) Generate(data Data) (string, error) {
-	jwtWrapper.config.Logger.Info("generating", zap.Any("data", data))
+	jwtWrapper.config.Logger.Info("generate token")
+	jwtWrapper.config.Logger.Debug("generating jwt", zap.Any("data", data))
 
 	claims := claims_impl{
 		Data: data,
@@ -37,39 +38,37 @@ func (jwtWrapper *jwt_impl) Generate(data Data) (string, error) {
 		return "", ErrNotIdentified
 	}
 
-	jwtWrapper.config.Logger.Info("generated", zap.String("token", tokenStr))
+	jwtWrapper.config.Logger.Debug("generated", zap.String("token", tokenStr))
 	return tokenStr, nil
 }
 
 func (jwtWrapper *jwt_impl) Verify(tokenStr string) bool {
-	jwtWrapper.config.Logger.Info("verifying", zap.String("token", tokenStr))
+	jwtWrapper.config.Logger.Info("verifying token")
+	jwtWrapper.config.Logger.Debug("verifying", zap.String("token", tokenStr))
 	token, err := jwt.ParseWithClaims(tokenStr, &claims_impl{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtWrapper.config.Key, nil
 	})
 	if err != nil {
-		jwtWrapper.config.Logger.Error("parse error", zap.String("error", err.Error()))
-		jwtWrapper.config.Logger.Info("not verified")
+		jwtWrapper.config.Logger.Debug("parse token error", zap.String("error", err.Error()))
 		return false
 	}
 
 	if !token.Valid {
-		jwtWrapper.config.Logger.Info("not verified")
+		jwtWrapper.config.Logger.Debug("token invalid")
 		return false
 	}
 
 	claims, ok := token.Claims.(*claims_impl)
 	if !ok {
-		jwtWrapper.config.Logger.Error("claims invalid")
-		jwtWrapper.config.Logger.Info("not verified")
+		jwtWrapper.config.Logger.Debug("claims invalid")
 		return false
 	}
 
 	if claims.ExpiresAt < time.Now().Unix() {
-		jwtWrapper.config.Logger.Error("claims expired")
-		jwtWrapper.config.Logger.Info("not verified")
+		jwtWrapper.config.Logger.Debug("token expired")
 		return false
 	}
 
-	jwtWrapper.config.Logger.Info("verified")
+	jwtWrapper.config.Logger.Debug("token valid")
 	return true
 }

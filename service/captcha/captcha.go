@@ -21,7 +21,8 @@ func NewCaptcha(config Config) Captcha {
 }
 
 func (captcha *captcha_impl) Generate(height int, width int) (string, error) {
-	captcha.config.Logger.Info("generating")
+	captcha.config.Logger.Info("generate captcha")
+	captcha.config.Logger.Debug("generating captcha", zap.Int("height", height), zap.Int("width", width))
 
 	driver := base64Captcha.NewDriverMath(height, width, captcha.config.NoiseCount, 0, nil, nil, nil)
 	id, question, answer := driver.GenerateIdQuestionAnswer()
@@ -50,52 +51,47 @@ func (captcha *captcha_impl) Generate(height int, width int) (string, error) {
 		return "", ErrNotIdentified
 	}
 
-	captcha.config.Logger.Info("generated", zap.Any("clains", claims), zap.String("answer", answer))
+	captcha.config.Logger.Debug("captcha generated", zap.Any("clains", claims), zap.String("answer", answer))
 	return tokenStr, nil
 }
 
 func (captcha *captcha_impl) Verify(tokenStr string, answer string) bool {
-	logger := captcha.config.Logger.With(
-		zap.String("signed string", tokenStr),
+	captcha.config.Logger.Info("verify captcha")
+	captcha.config.Logger.Debug("verify captcha",
+		zap.String("token", tokenStr),
 		zap.String("answer", answer),
 	)
 
-	logger.Info("verifying")
 	token, err := jwt.ParseWithClaims(tokenStr, &claims_impl{}, func(token *jwt.Token) (interface{}, error) {
 		return captcha.config.Key, nil
 	})
 	if err != nil {
-		logger.Error("parse error")
-		logger.Info("not verified")
+		captcha.config.Logger.Debug("unidentified parse captcha's token error", zap.String("error", err.Error()))
 		return false
 	}
 
 	if !token.Valid {
-		logger.Error("token invalid")
-		logger.Info("not verified")
+		captcha.config.Logger.Debug("captcha's token invalid")
 		return false
 	}
 
 	claims, ok := token.Claims.(*claims_impl)
 	if !ok {
-		logger.Error("claims invalid")
-		logger.Info("not verified")
+		captcha.config.Logger.Debug("captcha's claims invalid")
 		return false
 	}
 
 	if claims.ExpiresAt < time.Now().Unix() {
-		logger.Error("claims expired")
-		logger.Info("not verified")
+		captcha.config.Logger.Debug("captcha's token expired")
 		return false
 	}
 
 	encrypted_answer := hash([]byte(claims.Session + answer))
 	if encrypted_answer != claims.SessionKey {
-		logger.Error("answer does not match")
-		logger.Info("not verified")
+		captcha.config.Logger.Debug("wrong captcha answer")
 		return false
 	}
 
-	logger.Info("verified")
+	captcha.config.Logger.Debug("captcha valid")
 	return true
 }

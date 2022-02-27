@@ -19,21 +19,21 @@ type service_impl struct {
 
 func NewService(config Config) (Service, error) {
 	dbConfig := database.Config{
-		Logger:     config.Logger,
+		Logger:     config.Logger.Named("database"),
 		Host:       config.DatabaseHost,
 		Database:   config.DatabaseName,
 		Collection: config.ColectionName,
 	}
 
 	captchaConfig := captcha.Config{
-		Logger:     config.Logger,
+		Logger:     config.Logger.Named("captcha"),
 		Key:        config.Key,
 		Lifetime:   config.CaptchaLifetime,
 		NoiseCount: config.CaptchaNoiseCount,
 	}
 
 	jwtConfig := jwt.Config{
-		Logger:   config.Logger,
+		Logger:   config.Logger.Named("jwt"),
 		Key:      config.Key,
 		Lifetime: config.JWTLifetime,
 	}

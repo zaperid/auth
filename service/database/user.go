@@ -9,7 +9,8 @@ import (
 )
 
 func (database *database_impl) Insert(ctx context.Context, data *Data) error {
-	database.config.Logger.Info("inserting", zap.Any("data", data))
+	database.config.Logger.Info("insert data")
+	database.config.Logger.Debug("inserting data", zap.Any("data", data))
 
 	if database.col == nil {
 		return ErrorDisconnected
@@ -30,12 +31,13 @@ func (database *database_impl) Insert(ctx context.Context, data *Data) error {
 		data.ID = id
 	}
 
-	database.config.Logger.Debug("inserted", zap.Any("data", data))
+	database.config.Logger.Debug("data inserted", zap.Any("data", data))
 	return nil
 }
 
 func (database *database_impl) Find(ctx context.Context, data *Data) error {
-	database.config.Logger.Info("finding", zap.Any("data", data))
+	database.config.Logger.Info("find data")
+	database.config.Logger.Debug("finding data", zap.Any("data", data))
 
 	if database.col == nil {
 		return ErrorDisconnected
@@ -55,7 +57,6 @@ func (database *database_impl) Find(ctx context.Context, data *Data) error {
 		}
 	}
 
-	database.config.Logger.Info("found", zap.Any("data", data))
-
+	database.config.Logger.Debug("data found", zap.Any("data", data))
 	return nil
 }
