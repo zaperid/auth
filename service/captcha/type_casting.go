@@ -14,7 +14,7 @@ var (
 
 type Captcha interface {
 	Generate(height int, width int) (string, error)
-	Verify(signedStr string, answer string) bool
+	Verify(tokenStr string, answer string) bool
 }
 
 type Config struct {
