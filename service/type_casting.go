@@ -19,7 +19,8 @@ type Service interface {
 }
 
 type Config struct {
-	Logger       *zap.Logger
-	DatabaseHost string
-	DatabaseName string
+	Logger        *zap.Logger
+	DatabaseHost  string
+	DatabaseName  string
+	ColectionName string
 }

@@ -18,7 +18,7 @@ func NewService(config Config) (Service, error) {
 		Logger:     config.Logger,
 		Host:       config.DatabaseHost,
 		Database:   config.DatabaseName,
-		Collection: "user",
+		Collection: config.ColectionName,
 	}
 
 	service := service_impl{
