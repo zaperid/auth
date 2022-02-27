@@ -62,8 +62,8 @@ func (service *service_impl) GenerateCaptcha(height int, width int) (string, err
 	return service.captcha.Generate(height, width)
 }
 
-func (service *service_impl) Register(ctx context.Context, token string, answer string, username string, password string, passwordConfirm string) error {
-	if !service.captcha.Verify(token, answer) {
+func (service *service_impl) Register(ctx context.Context, captchaToken string, answer string, username string, password string, passwordConfirm string) error {
+	if !service.captcha.Verify(captchaToken, answer) {
 		return ErrCaptchaInvalid
 	}
 
