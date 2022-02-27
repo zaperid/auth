@@ -61,11 +61,7 @@ func (captcha *captcha_impl) Verify(tokenStr string, answer string) bool {
 	)
 
 	logger.Info("verifying")
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, jwt.ErrTokenUnverifiable
-		}
-
+	token, err := jwt.ParseWithClaims(tokenStr, &claims_impl{}, func(token *jwt.Token) (interface{}, error) {
 		return captcha.config.Key, nil
 	})
 	if err != nil {
@@ -80,7 +76,7 @@ func (captcha *captcha_impl) Verify(tokenStr string, answer string) bool {
 		return false
 	}
 
-	claims, ok := token.Claims.(claims_impl)
+	claims, ok := token.Claims.(*claims_impl)
 	if !ok {
 		logger.Error("claims invalid")
 		logger.Info("not verified")
