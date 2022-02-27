@@ -15,6 +15,7 @@ var (
 type Service interface {
 	Close() error
 	Register(ctx context.Context, username string, password string, passwordConfirm string) error
+	UsedUsername(ctx context.Context, username string) (bool, error)
 }
 
 type Config struct {
