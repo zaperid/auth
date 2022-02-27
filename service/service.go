@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"montrek-auth/service/captcha"
 	"montrek-auth/service/database"
 	"montrek-auth/service/hash"
 	"time"
@@ -10,6 +11,7 @@ import (
 type service_impl struct {
 	config  Config
 	db      database.Database
+	captcha captcha.Captcha
 	timeout time.Duration
 }
 
@@ -21,10 +23,18 @@ func NewService(config Config) (Service, error) {
 		Collection: config.ColectionName,
 	}
 
+	captchaConfig := captcha.Config{
+		Logger:     config.Logger,
+		Key:        config.Key,
+		Lifetime:   config.CaptchaLifetime,
+		NoiseCount: config.CaptchaNoiseCount,
+	}
+
 	service := service_impl{
 		config:  config,
 		db:      database.NewDatabase(dbConfig),
 		timeout: 30 * time.Second,
+		captcha: captcha.NewCaptcha(captchaConfig),
 	}
 
 	ctx, ctxCancel := context.WithTimeout(context.Background(), service.timeout)
@@ -48,7 +58,15 @@ func (service *service_impl) Close() error {
 	return nil
 }
 
-func (service *service_impl) Register(ctx context.Context, username string, password string, passwordConfirm string) error {
+func (service *service_impl) GenerateCaptcha(height int, width int) (string, error) {
+	return service.captcha.Generate(height, width)
+}
+
+func (service *service_impl) Register(ctx context.Context, token string, answer string, username string, password string, passwordConfirm string) error {
+	if !service.captcha.Verify(token, answer) {
+		return ErrCaptchaInvalid
+	}
+
 	if password != passwordConfirm {
 		return ErrPassNotConfirm
 	}
