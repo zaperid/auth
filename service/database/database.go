@@ -5,6 +5,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"go.uber.org/zap"
 )
 
@@ -36,6 +37,14 @@ func (database *database_impl) Connect(ctx context.Context) error {
 	if err != nil {
 		database.config.Logger.Debug(ErrorNotIdentified.Error(), zap.String("error", err.Error()))
 		return ErrorNotIdentified
+	}
+
+	{
+		err := database.client.Ping(ctx, readpref.Primary())
+		if err != nil {
+			database.config.Logger.Debug(ErrorNotIdentified.Error(), zap.String("error", err.Error()))
+			return ErrorNotIdentified
+		}
 	}
 
 	database.col = database.client.Database(database.config.Database).Collection(database.config.Collection)
