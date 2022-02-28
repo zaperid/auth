@@ -7,6 +7,8 @@ import (
 	"montrek-auth/service/hash"
 	"montrek-auth/service/jwt"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type service_impl struct {
@@ -18,6 +20,8 @@ type service_impl struct {
 }
 
 func NewService(config Config) (Service, error) {
+	defer config.Logger.Info("initalize service", zap.String("execution time", executionTime(time.Now())))
+
 	dbConfig := database.Config{
 		Logger:     config.Logger.Named("database"),
 		Host:       config.DatabaseHost,
@@ -57,6 +61,8 @@ func NewService(config Config) (Service, error) {
 }
 
 func (service *service_impl) Close() error {
+	defer service.config.Logger.Info("close service", zap.String("execution time", executionTime(time.Now())))
+
 	ctx, ctxCancel := context.WithTimeout(context.Background(), service.timeout)
 	err := service.db.Disconnect(ctx)
 	ctxCancel()
@@ -68,10 +74,14 @@ func (service *service_impl) Close() error {
 }
 
 func (service *service_impl) GenerateCaptcha(height int, width int) (token string, image string, err error) {
+	defer service.config.Logger.Info("generate captcha", zap.String("execution time", executionTime(time.Now())))
+
 	return service.captcha.Generate(height, width)
 }
 
 func (service *service_impl) Register(ctx context.Context, captchaToken string, answer string, username string, password string, passwordConfirm string) (err error) {
+	defer service.config.Logger.Info("register user", zap.String("execution time", executionTime(time.Now())))
+
 	if !service.captcha.Verify(captchaToken, answer) {
 		return ErrCaptchaInvalid
 	}
@@ -116,6 +126,8 @@ func (service *service_impl) Register(ctx context.Context, captchaToken string, 
 }
 
 func (service *service_impl) UsedUsername(ctx context.Context, username string) (used bool, err error) {
+	defer service.config.Logger.Info("check username", zap.String("execution time", executionTime(time.Now())))
+
 	data := database.Data{
 		Username: username,
 	}
@@ -132,6 +144,8 @@ func (service *service_impl) UsedUsername(ctx context.Context, username string) 
 }
 
 func (service *service_impl) Login(ctx context.Context, captchaToken string, answer string, username string, password string) (token string, err error) {
+	defer service.config.Logger.Info("user login", zap.String("execution time", executionTime(time.Now())))
+
 	if !service.captcha.Verify(captchaToken, answer) {
 		return "", ErrCaptchaInvalid
 	}
