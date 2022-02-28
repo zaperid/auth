@@ -51,7 +51,7 @@ func (captcha *captcha_impl) Generate(height int, width int) (tokenStr string, q
 		return "", "", ErrNotIdentified
 	}
 
-	captcha.config.Logger.Debug("captcha generated", zap.Any("clains", claims), zap.String("image", questionImgStr), zap.String("answer", answer))
+	captcha.config.Logger.Debug("captcha generated", zap.Any("token", tokenStr), zap.String("image", questionImgStr), zap.String("answer", answer))
 	return tokenStr, questionImgStr, nil
 }
 
