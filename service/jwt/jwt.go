@@ -25,9 +25,9 @@ func (jwtWrapper *jwt_impl) Generate(data Data) (tokenStr string, err error) {
 
 	claims := claims_impl{
 		Data: data,
-		StandardClaims: jwt.StandardClaims{
-			IssuedAt:  time.Now().Unix(),
-			ExpiresAt: time.Now().Add(jwtWrapper.config.Lifetime).Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(jwtWrapper.config.Lifetime)),
 		},
 	}
 
@@ -49,8 +49,11 @@ func (jwtWrapper *jwt_impl) Verify(tokenStr string) (valid bool) {
 		return jwtWrapper.config.Key, nil
 	})
 	if err != nil {
-		jwtWrapper.config.Logger.Debug("parse token error", zap.String("error", err.Error()))
-		return false
+		switch err {
+		default:
+			jwtWrapper.config.Logger.Debug("parse token error", zap.String("error", err.Error()))
+			return false
+		}
 	}
 
 	if !token.Valid {
@@ -58,14 +61,9 @@ func (jwtWrapper *jwt_impl) Verify(tokenStr string) (valid bool) {
 		return false
 	}
 
-	claims, ok := token.Claims.(*claims_impl)
+	_, ok := token.Claims.(*claims_impl)
 	if !ok {
 		jwtWrapper.config.Logger.Debug("claims invalid")
-		return false
-	}
-
-	if claims.ExpiresAt < time.Now().Unix() {
-		jwtWrapper.config.Logger.Debug("token expired")
 		return false
 	}
 

@@ -29,5 +29,5 @@ type Data struct {
 
 type claims_impl struct {
 	Data
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
