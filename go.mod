@@ -3,6 +3,7 @@ module montrek-auth
 go 1.17
 
 require (
+	github.com/go-kit/kit v0.12.0
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/stretchr/testify v1.7.0
