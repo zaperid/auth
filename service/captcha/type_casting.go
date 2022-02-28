@@ -27,5 +27,5 @@ type Config struct {
 type claims_impl struct {
 	Session    string `json:"session"`
 	SessionKey string `json:"sesion_key"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }

@@ -38,9 +38,9 @@ func (captcha *captcha_impl) Generate(height int, width int) (tokenStr string, q
 	claims := claims_impl{
 		Session:    id,
 		SessionKey: encrypted_answer,
-		StandardClaims: jwt.StandardClaims{
-			IssuedAt:  time.Now().Unix(),
-			ExpiresAt: time.Now().Add(captcha.config.Lifetime).Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(captcha.config.Lifetime)),
 		},
 	}
 
@@ -66,8 +66,11 @@ func (captcha *captcha_impl) Verify(tokenStr string, answer string) (valid bool)
 		return captcha.config.Key, nil
 	})
 	if err != nil {
-		captcha.config.Logger.Debug("unidentified parse captcha's token error", zap.String("error", err.Error()))
-		return false
+		switch err {
+		default:
+			captcha.config.Logger.Debug("unidentified parse captcha's token error", zap.String("error", err.Error()))
+			return false
+		}
 	}
 
 	if !token.Valid {
@@ -78,11 +81,6 @@ func (captcha *captcha_impl) Verify(tokenStr string, answer string) (valid bool)
 	claims, ok := token.Claims.(*claims_impl)
 	if !ok {
 		captcha.config.Logger.Debug("captcha's claims invalid")
-		return false
-	}
-
-	if claims.ExpiresAt < time.Now().Unix() {
-		captcha.config.Logger.Debug("captcha's token expired")
 		return false
 	}
 
