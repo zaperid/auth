@@ -19,7 +19,7 @@ func NewJwt(config Config) JWT {
 	return &jwt
 }
 
-func (jwtWrapper *jwt_impl) Generate(data Data) (string, error) {
+func (jwtWrapper *jwt_impl) Generate(data Data) (tokenStr string, err error) {
 	jwtWrapper.config.Logger.Info("generate token")
 	jwtWrapper.config.Logger.Debug("generating jwt", zap.Any("data", data))
 
@@ -32,7 +32,7 @@ func (jwtWrapper *jwt_impl) Generate(data Data) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenStr, err := token.SignedString(jwtWrapper.config.Key)
+	tokenStr, err = token.SignedString(jwtWrapper.config.Key)
 	if err != nil {
 		jwtWrapper.config.Logger.Debug(ErrNotIdentified.Error(), zap.String("error", err.Error()))
 		return "", ErrNotIdentified
@@ -42,7 +42,7 @@ func (jwtWrapper *jwt_impl) Generate(data Data) (string, error) {
 	return tokenStr, nil
 }
 
-func (jwtWrapper *jwt_impl) Verify(tokenStr string) bool {
+func (jwtWrapper *jwt_impl) Verify(tokenStr string) (valid bool) {
 	jwtWrapper.config.Logger.Info("verifying token")
 	jwtWrapper.config.Logger.Debug("verifying", zap.String("token", tokenStr))
 	token, err := jwt.ParseWithClaims(tokenStr, &claims_impl{}, func(token *jwt.Token) (interface{}, error) {

@@ -67,11 +67,11 @@ func (service *service_impl) Close() error {
 	return nil
 }
 
-func (service *service_impl) GenerateCaptcha(height int, width int) (string, string, error) {
+func (service *service_impl) GenerateCaptcha(height int, width int) (token string, image string, err error) {
 	return service.captcha.Generate(height, width)
 }
 
-func (service *service_impl) Register(ctx context.Context, captchaToken string, answer string, username string, password string, passwordConfirm string) error {
+func (service *service_impl) Register(ctx context.Context, captchaToken string, answer string, username string, password string, passwordConfirm string) (err error) {
 	if !service.captcha.Verify(captchaToken, answer) {
 		return ErrCaptchaInvalid
 	}
@@ -115,12 +115,12 @@ func (service *service_impl) Register(ctx context.Context, captchaToken string, 
 	return nil
 }
 
-func (service *service_impl) UsedUsername(ctx context.Context, username string) (bool, error) {
+func (service *service_impl) UsedUsername(ctx context.Context, username string) (used bool, err error) {
 	data := database.Data{
 		Username: username,
 	}
 
-	err := service.db.Find(ctx, &data)
+	err = service.db.Find(ctx, &data)
 	if err == database.ErrorNotFound {
 		return false, nil
 	}
@@ -131,7 +131,7 @@ func (service *service_impl) UsedUsername(ctx context.Context, username string) 
 	return true, nil
 }
 
-func (service *service_impl) Login(ctx context.Context, captchaToken string, answer string, username string, password string) (string, error) {
+func (service *service_impl) Login(ctx context.Context, captchaToken string, answer string, username string, password string) (token string, err error) {
 	if !service.captcha.Verify(captchaToken, answer) {
 		return "", ErrCaptchaInvalid
 	}
@@ -140,7 +140,7 @@ func (service *service_impl) Login(ctx context.Context, captchaToken string, ans
 		Username: username,
 	}
 
-	err := service.db.Find(ctx, &data)
+	err = service.db.Find(ctx, &data)
 	if err != nil {
 		return "", err
 	}

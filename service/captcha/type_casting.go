@@ -13,8 +13,8 @@ var (
 )
 
 type Captcha interface {
-	Generate(height int, width int) (string, string, error)
-	Verify(tokenStr string, answer string) bool
+	Generate(height int, width int) (token string, image string, err error)
+	Verify(tokenStr string, answer string) (valid bool)
 }
 
 type Config struct {

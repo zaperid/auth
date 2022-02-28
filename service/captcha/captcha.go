@@ -20,7 +20,7 @@ func NewCaptcha(config Config) Captcha {
 	return &captch
 }
 
-func (captcha *captcha_impl) Generate(height int, width int) (string, string, error) {
+func (captcha *captcha_impl) Generate(height int, width int) (tokenStr string, questionImgStr string, err error) {
 	captcha.config.Logger.Info("generate captcha")
 	captcha.config.Logger.Debug("generating captcha", zap.Int("height", height), zap.Int("width", width))
 
@@ -31,7 +31,7 @@ func (captcha *captcha_impl) Generate(height int, width int) (string, string, er
 		captcha.config.Logger.Debug(ErrNotIdentified.Error(), zap.String("error", err.Error()))
 		return "", "", ErrNotIdentified
 	}
-	questionImgStr := questionImg.EncodeB64string()
+	questionImgStr = questionImg.EncodeB64string()
 
 	encrypted_answer := hash([]byte(id + answer))
 
@@ -45,7 +45,7 @@ func (captcha *captcha_impl) Generate(height int, width int) (string, string, er
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenStr, err := token.SignedString(captcha.config.Key)
+	tokenStr, err = token.SignedString(captcha.config.Key)
 	if err != nil {
 		captcha.config.Logger.Debug(ErrNotIdentified.Error(), zap.String("error", err.Error()))
 		return "", "", ErrNotIdentified
@@ -55,7 +55,7 @@ func (captcha *captcha_impl) Generate(height int, width int) (string, string, er
 	return tokenStr, questionImgStr, nil
 }
 
-func (captcha *captcha_impl) Verify(tokenStr string, answer string) bool {
+func (captcha *captcha_impl) Verify(tokenStr string, answer string) (valid bool) {
 	captcha.config.Logger.Info("verify captcha")
 	captcha.config.Logger.Debug("verify captcha",
 		zap.String("token", tokenStr),

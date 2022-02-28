@@ -18,10 +18,10 @@ var (
 
 type Service interface {
 	Close() error
-	GenerateCaptcha(height int, width int) (string, string, error)
-	Register(ctx context.Context, captchaToken string, answer string, username string, password string, passwordConfirm string) error
-	UsedUsername(ctx context.Context, username string) (bool, error)
-	Login(ctx context.Context, captchaToken string, answer string, username string, password string) (string, error)
+	GenerateCaptcha(height int, width int) (token string, image string, err error)
+	Register(ctx context.Context, captchaToken string, answer string, username string, password string, passwordConfirm string) (err error)
+	UsedUsername(ctx context.Context, username string) (used bool, err error)
+	Login(ctx context.Context, captchaToken string, answer string, username string, password string) (token string, err error)
 }
 
 type Config struct {

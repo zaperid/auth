@@ -13,8 +13,8 @@ var (
 )
 
 type JWT interface {
-	Generate(data Data) (string, error)
-	Verify(tokenStr string) bool
+	Generate(data Data) (token string, err error)
+	Verify(token string) (valid bool)
 }
 
 type Config struct {
