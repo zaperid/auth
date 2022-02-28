@@ -13,7 +13,7 @@ var (
 )
 
 type Captcha interface {
-	Generate(height int, width int) (string, error)
+	Generate(height int, width int) (string, string, error)
 	Verify(tokenStr string, answer string) bool
 }
 
@@ -25,7 +25,6 @@ type Config struct {
 }
 
 type claims_impl struct {
-	Image      string `json:"image"`
 	Session    string `json:"session"`
 	SessionKey string `json:"sesion_key"`
 	jwt.StandardClaims

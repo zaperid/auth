@@ -67,7 +67,7 @@ func (service *service_impl) Close() error {
 	return nil
 }
 
-func (service *service_impl) GenerateCaptcha(height int, width int) (string, error) {
+func (service *service_impl) GenerateCaptcha(height int, width int) (string, string, error) {
 	return service.captcha.Generate(height, width)
 }
 
