@@ -76,6 +76,20 @@ func (service *service_impl) Register(ctx context.Context, captchaToken string, 
 		return ErrCaptchaInvalid
 	}
 
+	{
+		lenUsername := len(username)
+		if lenUsername < 4 || lenUsername > 20 {
+			return ErrLenUsername
+		}
+	}
+
+	{
+		lenPassword := len(password)
+		if lenPassword < 8 || lenPassword > 20 {
+			return ErrLenPassword
+		}
+	}
+
 	if password != passwordConfirm {
 		return ErrPassNotConfirm
 	}

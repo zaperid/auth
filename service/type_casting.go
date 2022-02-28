@@ -12,6 +12,8 @@ var (
 	ErrPassNotConfirm = errors.New("password not confirm")
 	ErrUsernamedUsed  = errors.New("username already been used")
 	ErrCaptchaInvalid = errors.New("captcha invalid")
+	ErrLenUsername    = errors.New("username length must be between 4 to 20 characters")
+	ErrLenPassword    = errors.New("password length must be between 8 to 20 characters")
 )
 
 type Service interface {
