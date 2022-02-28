@@ -107,14 +107,14 @@ func (service *service_impl) UsedUsername(ctx context.Context, username string) 
 	}
 
 	err := service.db.Find(ctx, &data)
-	if err != database.ErrorNotFound {
-		return true, nil
+	if err == database.ErrorNotFound {
+		return false, nil
 	}
 	if err != nil {
 		return false, err
 	}
 
-	return false, nil
+	return true, nil
 }
 
 func (service *service_impl) Login(ctx context.Context, captchaToken string, answer string, username string, password string) (string, error) {
