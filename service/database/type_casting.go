@@ -26,6 +26,7 @@ type Database interface {
 	Disconnect(ctx context.Context) error
 	Insert(ctx context.Context, data *Data) error
 	Find(ctx context.Context, data *Data) error
+	Update(ctx context.Context, data Data) error
 }
 
 type Data struct {

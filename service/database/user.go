@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
@@ -58,5 +59,21 @@ func (database *database_impl) Find(ctx context.Context, data *Data) error {
 	}
 
 	database.config.Logger.Debug("data found", zap.Any("data", data))
+	return nil
+}
+
+func (database *database_impl) Update(ctx context.Context, data Data) error {
+	filter := Data{
+		ID: data.ID,
+	}
+	data.ID = primitive.NilObjectID
+
+	update := bson.D{{"$set", data}}
+
+	_, err := database.col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
