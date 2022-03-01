@@ -159,6 +159,10 @@ func (service *service_impl) Login(ctx context.Context, captchaToken string, ans
 		return "", err
 	}
 
+	if data.Password != hash.Hash([]byte(password)) {
+		return "", ErrPassword
+	}
+
 	jwtData := jwt.Data{
 		ID: data.ID.String(),
 	}
