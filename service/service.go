@@ -54,8 +54,10 @@ func NewService(config Config) (Service, error) {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), service.timeout)
 	err := service.db.Connect(ctx)
 	ctxCancel()
+
 	if err != nil {
-		return nil, err
+		service.config.Logger.Error(err.Error())
+		return nil, ErrConnectToDatabase
 	}
 
 	return &service, nil
@@ -67,8 +69,10 @@ func (service *service_impl) Close() error {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), service.timeout)
 	err := service.db.Disconnect(ctx)
 	ctxCancel()
+
 	if err != nil {
-		return err
+		service.config.Logger.Error(err.Error())
+		return ErrConnectToDatabase
 	}
 
 	return nil
@@ -77,7 +81,12 @@ func (service *service_impl) Close() error {
 func (service *service_impl) GenerateCaptcha(height int, width int) (token string, image string, err error) {
 	defer service.config.Logger.Info("generate captcha", zap.String("execution time", executionTime(time.Now())))
 
-	return service.captcha.Generate(height, width)
+	token, image, err = service.captcha.Generate(height, width)
+	if err != nil {
+		return "", "", ErrGenerateCaptcha
+	}
+
+	return token, image, nil
 }
 
 func (service *service_impl) Register(ctx context.Context, captchaToken string, answer string, username string, password string, passwordConfirm string) (err error) {
@@ -120,7 +129,8 @@ func (service *service_impl) Register(ctx context.Context, captchaToken string, 
 
 	err = service.db.Insert(ctx, &data)
 	if err != nil {
-		return err
+		service.config.Logger.Error(err.Error())
+		return ErrInsertData
 	}
 
 	return nil
@@ -138,7 +148,8 @@ func (service *service_impl) UsedUsername(ctx context.Context, username string) 
 		return false, nil
 	}
 	if err != nil {
-		return false, err
+		service.config.Logger.Error(err.Error())
+		return false, ErrFindData
 	}
 
 	return true, nil
@@ -157,7 +168,8 @@ func (service *service_impl) Login(ctx context.Context, captchaToken string, ans
 
 	err = service.db.Find(ctx, &data)
 	if err != nil {
-		return "", err
+		service.config.Logger.Error(err.Error())
+		return "", ErrFindData
 	}
 
 	if data.Password != hash.Hash([]byte(password)) {
@@ -170,7 +182,8 @@ func (service *service_impl) Login(ctx context.Context, captchaToken string, ans
 
 	tokenStr, err := service.jwt.Generate(jwtData)
 	if err != nil {
-		return "", err
+		service.config.Logger.Error(err.Error())
+		return "", ErrGenerateToken
 	}
 
 	return tokenStr, nil
@@ -196,12 +209,14 @@ func (service *service_impl) ChangePassword(ctx context.Context, token string, c
 
 	dbData.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
 	if err != nil {
+		service.config.Logger.Error(err.Error())
 		return ErrIDInvalid
 	}
 
 	err = service.db.Find(ctx, &dbData)
 	if err != nil {
-		return err
+		service.config.Logger.Error(err.Error())
+		return ErrFindData
 	}
 
 	if dbData.Password != hash.Hash([]byte(oldPassword)) {
@@ -213,7 +228,8 @@ func (service *service_impl) ChangePassword(ctx context.Context, token string, c
 		Password: hash.Hash([]byte(newPassword)),
 	})
 	if err != nil {
-		return err
+		service.config.Logger.Error(err.Error())
+		return ErrUpdateData
 	}
 
 	return nil
