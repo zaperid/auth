@@ -44,5 +44,7 @@ type Config struct {
 	Key               []byte
 	CaptchaLifetime   time.Duration
 	CaptchaNoiseCount int
+	CaptchaShowline   int
+	CaptchaLength     int
 	JWTLifetime       time.Duration
 }

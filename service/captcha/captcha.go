@@ -10,28 +10,37 @@ import (
 
 type captcha_impl struct {
 	config Config
+	source string
 }
 
 func NewCaptcha(config Config) Captcha {
 	captch := captcha_impl{
 		config: config,
+		source: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
 	}
 
 	return &captch
 }
 
-func (captcha *captcha_impl) Generate(height int, width int) (tokenStr string, questionImgStr string, err error) {
+func (captcha *captcha_impl) Generate(height int, width int) (tokenStr string, imgStr string, err error) {
 	captcha.config.Logger.Info("generate captcha")
 	captcha.config.Logger.Debug("generating captcha", zap.Int("height", height), zap.Int("width", width))
 
-	driver := base64Captcha.NewDriverMath(height, width, captcha.config.NoiseCount, 0, nil, nil, nil)
+	driver := base64Captcha.NewDriverString(
+		height, width,
+		captcha.config.NoiseCount,
+		captcha.config.ShowLine,
+		captcha.config.Length,
+		captcha.source,
+		nil, nil, nil,
+	)
 	id, question, answer := driver.GenerateIdQuestionAnswer()
-	questionImg, err := driver.DrawCaptcha(question)
+	img, err := driver.DrawCaptcha(question)
 	if err != nil {
 		captcha.config.Logger.Debug(ErrNotIdentified.Error(), zap.String("error", err.Error()))
 		return "", "", ErrNotIdentified
 	}
-	questionImgStr = questionImg.EncodeB64string()
+	imgStr = img.EncodeB64string()
 
 	encrypted_answer := hash([]byte(id + answer))
 
@@ -51,8 +60,8 @@ func (captcha *captcha_impl) Generate(height int, width int) (tokenStr string, q
 		return "", "", ErrNotIdentified
 	}
 
-	captcha.config.Logger.Debug("captcha generated", zap.Any("token", tokenStr), zap.String("image", questionImgStr), zap.String("answer", answer))
-	return tokenStr, questionImgStr, nil
+	captcha.config.Logger.Debug("captcha generated", zap.Any("token", tokenStr), zap.String("image", imgStr), zap.String("answer", answer))
+	return tokenStr, imgStr, nil
 }
 
 func (captcha *captcha_impl) Verify(tokenStr string, answer string) (valid bool) {

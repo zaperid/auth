@@ -35,6 +35,8 @@ func NewService(config Config) (Service, error) {
 		Key:        config.Key,
 		Lifetime:   config.CaptchaLifetime,
 		NoiseCount: config.CaptchaNoiseCount,
+		ShowLine:   config.CaptchaShowline,
+		Length:     config.CaptchaLength,
 	}
 
 	jwtConfig := jwt.Config{

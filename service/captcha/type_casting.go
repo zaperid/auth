@@ -22,6 +22,8 @@ type Config struct {
 	Key        []byte
 	Lifetime   time.Duration
 	NoiseCount int
+	ShowLine   int
+	Length     int
 }
 
 type claims_impl struct {
