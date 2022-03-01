@@ -17,7 +17,7 @@ func TestConsistency(t *testing.T) {
 	}
 
 	config := jwt.Config{
-		Logger:   zap.NewExample(),
+		Logger:   zap.NewNop(),
 		Key:      []byte("4321"),
 		Lifetime: 1 * time.Minute,
 	}
@@ -27,8 +27,12 @@ func TestConsistency(t *testing.T) {
 		return
 	}
 
-	verifed := jwt.Verify(tokenStr)
-	if !assert.True(t, verifed) {
+	parsedData, valid := jwt.Parse(tokenStr)
+	if !assert.True(t, valid) {
+		return
+	}
+
+	if !assert.Equal(t, data, parsedData) {
 		return
 	}
 }

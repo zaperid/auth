@@ -42,9 +42,9 @@ func (jwtWrapper *jwt_impl) Generate(data Data) (tokenStr string, err error) {
 	return tokenStr, nil
 }
 
-func (jwtWrapper *jwt_impl) Verify(tokenStr string) (valid bool) {
-	jwtWrapper.config.Logger.Info("verifying token")
-	jwtWrapper.config.Logger.Debug("verifying", zap.String("token", tokenStr))
+func (jwtWrapper *jwt_impl) Parse(tokenStr string) (data Data, valid bool) {
+	jwtWrapper.config.Logger.Info("parse token")
+	jwtWrapper.config.Logger.Debug("parsing token", zap.String("token", tokenStr))
 	token, err := jwt.ParseWithClaims(tokenStr, &claims_impl{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtWrapper.config.Key, nil
 	})
@@ -52,21 +52,21 @@ func (jwtWrapper *jwt_impl) Verify(tokenStr string) (valid bool) {
 		switch err {
 		default:
 			jwtWrapper.config.Logger.Debug("parse token error", zap.String("error", err.Error()))
-			return false
+			return data, false
 		}
 	}
 
 	if !token.Valid {
 		jwtWrapper.config.Logger.Debug("token invalid")
-		return false
+		return data, false
 	}
 
-	_, ok := token.Claims.(*claims_impl)
+	claims, ok := token.Claims.(*claims_impl)
 	if !ok {
 		jwtWrapper.config.Logger.Debug("claims invalid")
-		return false
+		return data, false
 	}
 
-	jwtWrapper.config.Logger.Debug("token valid")
-	return true
+	jwtWrapper.config.Logger.Debug("token valid", zap.Any("data", data), zap.Bool("valid", true))
+	return claims.Data, true
 }
