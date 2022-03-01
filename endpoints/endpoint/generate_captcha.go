@@ -13,9 +13,9 @@ type GenerateCaptchaRequest struct {
 }
 
 type GenerateCaptchaResponse struct {
-	Token string `json:"token,omitempty"`
-	Image string `json:"image,omitempty"`
-	Error string `json:"error,omitempty"`
+	CaptchaToken string `json:"captcha_token,omitempty"`
+	Image        string `json:"image,omitempty"`
+	Error        string `json:"error,omitempty"`
 }
 
 func GenerateCaptchaEndpoint(svc service.Service) endpoint.Endpoint {
@@ -28,7 +28,7 @@ func GenerateCaptchaEndpoint(svc service.Service) endpoint.Endpoint {
 		}
 
 		var err error
-		res.Token, res.Image, err = svc.GenerateCaptcha(req.Height, req.Width)
+		res.CaptchaToken, res.Image, err = svc.GenerateCaptcha(req.Height, req.Width)
 		if err != nil {
 			res.Error = err.Error()
 		}

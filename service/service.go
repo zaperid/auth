@@ -78,21 +78,21 @@ func (service *service_impl) Close() error {
 	return nil
 }
 
-func (service *service_impl) GenerateCaptcha(height int, width int) (token string, image string, err error) {
+func (service *service_impl) GenerateCaptcha(height int, width int) (captchaToken string, image string, err error) {
 	defer service.config.Logger.Info("generate captcha", zap.String("execution time", executionTime(time.Now())))
 
-	token, image, err = service.captcha.Generate(height, width)
+	captchaToken, image, err = service.captcha.Generate(height, width)
 	if err != nil {
 		return "", "", ErrGenerateCaptcha
 	}
 
-	return token, image, nil
+	return captchaToken, image, nil
 }
 
-func (service *service_impl) Register(ctx context.Context, captchaToken string, answer string, username string, password string, passwordConfirm string) (err error) {
+func (service *service_impl) Register(ctx context.Context, captchaToken string, captchaAnswer string, username string, password string, passwordConfirm string) (err error) {
 	defer service.config.Logger.Info("register user", zap.String("execution time", executionTime(time.Now())))
 
-	if !service.captcha.Verify(captchaToken, answer) {
+	if !service.captcha.Verify(captchaToken, captchaAnswer) {
 		return ErrCaptchaInvalid
 	}
 
@@ -155,10 +155,10 @@ func (service *service_impl) UsedUsername(ctx context.Context, username string) 
 	return true, nil
 }
 
-func (service *service_impl) Login(ctx context.Context, captchaToken string, answer string, username string, password string) (token string, err error) {
+func (service *service_impl) Login(ctx context.Context, captchaToken string, captchaAnswer string, username string, password string) (token string, err error) {
 	defer service.config.Logger.Info("user login", zap.String("execution time", executionTime(time.Now())))
 
-	if !service.captcha.Verify(captchaToken, answer) {
+	if !service.captcha.Verify(captchaToken, captchaAnswer) {
 		return "", ErrCaptchaInvalid
 	}
 

@@ -8,10 +8,10 @@ import (
 )
 
 type LoginRequest struct {
-	CaptchaToken string
-	Answer       string
-	Username     string
-	Password     string
+	CaptchaToken  string
+	CaptchaAnswer string
+	Username      string
+	Password      string
 }
 
 type LoginResponse struct {
@@ -29,7 +29,7 @@ func LoginEndpoint(svc service.Service) endpoint.Endpoint {
 		}
 
 		var err error
-		res.Token, err = svc.Login(ctx, req.CaptchaToken, req.Answer, req.Username, req.Password)
+		res.Token, err = svc.Login(ctx, req.CaptchaToken, req.CaptchaAnswer, req.Username, req.Password)
 		if err != nil {
 			res.Error = err.Error()
 		}

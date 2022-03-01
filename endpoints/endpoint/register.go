@@ -9,7 +9,7 @@ import (
 
 type RegisterRequest struct {
 	CaptchaToken    string
-	Answer          string
+	CaptchaAnswer   string
 	Username        string
 	Password        string
 	PasswordConfirm string
@@ -29,7 +29,7 @@ func RegisterEndpoint(svc service.Service) endpoint.Endpoint {
 		}
 
 		var err error
-		err = svc.Register(ctx, req.CaptchaToken, req.Answer, req.Username, req.Password, req.PasswordConfirm)
+		err = svc.Register(ctx, req.CaptchaToken, req.CaptchaAnswer, req.Username, req.Password, req.PasswordConfirm)
 		if err != nil {
 			res.Error = err.Error()
 		}

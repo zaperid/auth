@@ -29,11 +29,11 @@ var (
 
 type Service interface {
 	Close() error
-	GenerateCaptcha(height int, width int) (token string, image string, err error)
-	Register(ctx context.Context, captchaToken string, answer string, username string, password string, passwordConfirm string) (err error)
+	GenerateCaptcha(height int, width int) (captchaToken string, image string, err error)
 	UsedUsername(ctx context.Context, username string) (used bool, err error)
-	Login(ctx context.Context, captchaToken string, answer string, username string, password string) (token string, err error)
-	ChangePassword(ctx context.Context, token string, captchaToken string, captcha string, oldPassword string, newPassword string, newPasswordConfirm string) (err error)
+	Register(ctx context.Context, captchaToken string, captchaAnswer string, username string, password string, passwordConfirm string) (err error)
+	Login(ctx context.Context, captchaToken string, captchaAnswer string, username string, password string) (token string, err error)
+	ChangePassword(ctx context.Context, token string, captchaToken string, captchaAnswer string, oldPassword string, newPassword string, newPasswordConfirm string) (err error)
 }
 
 type Config struct {
