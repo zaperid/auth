@@ -8,6 +8,7 @@ import (
 	"montrek-auth/service/jwt"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 )
 
@@ -173,4 +174,47 @@ func (service *service_impl) Login(ctx context.Context, captchaToken string, ans
 	}
 
 	return tokenStr, nil
+}
+
+func (service *service_impl) ChangePassword(ctx context.Context, token string, captchaToken string, captcha string, oldPassword string, newPassword string, newPasswordConfirm string) (err error) {
+	defer service.config.Logger.Info("change user password", zap.String("execution time", executionTime(time.Now())))
+
+	jwtData, valid := service.jwt.Parse(token)
+	if !valid {
+		return ErrTokenInvalid
+	}
+
+	if !service.captcha.Verify(captchaToken, captcha) {
+		return ErrCaptchaInvalid
+	}
+
+	if newPassword != newPasswordConfirm {
+		return ErrPassNotConfirm
+	}
+
+	var dbData database.Data
+
+	dbData.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
+	if err != nil {
+		return ErrIDInvalid
+	}
+
+	err = service.db.Find(ctx, &dbData)
+	if err != nil {
+		return err
+	}
+
+	if dbData.Password != hash.Hash([]byte(oldPassword)) {
+		return ErrOldPassword
+	}
+
+	err = service.db.Update(ctx, database.Data{
+		ID:       dbData.ID,
+		Password: hash.Hash([]byte(newPassword)),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
