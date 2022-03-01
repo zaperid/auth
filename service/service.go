@@ -164,7 +164,7 @@ func (service *service_impl) Login(ctx context.Context, captchaToken string, ans
 	}
 
 	jwtData := jwt.Data{
-		ID: data.ID.String(),
+		ID: data.ID.Hex(),
 	}
 
 	tokenStr, err := service.jwt.Generate(jwtData)
