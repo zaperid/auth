@@ -9,4 +9,5 @@ type Endpoints struct {
 	Register        endpoint.Endpoint
 	UsedUsername    endpoint.Endpoint
 	Login           endpoint.Endpoint
+	ChangePassword  endpoint.Endpoint
 }
