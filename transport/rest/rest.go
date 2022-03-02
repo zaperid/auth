@@ -26,7 +26,7 @@ func NewServer(endpoints endpoints.Endpoints, config Config) Server {
 	}
 
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
+	corsConfig.AllowOrigins = config.AllowOrigins
 	server.gin.Use(cors.New(corsConfig))
 
 	server.setup()
