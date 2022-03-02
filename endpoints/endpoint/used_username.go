@@ -8,7 +8,7 @@ import (
 )
 
 type UsedUsernameRequest struct {
-	Username string
+	Username string `json:"username"`
 }
 
 type UsedUsernameResponse struct {

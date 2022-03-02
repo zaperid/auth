@@ -8,8 +8,8 @@ import (
 )
 
 type GenerateCaptchaRequest struct {
-	Height int
-	Width  int
+	Height int `json:"height"`
+	Width  int `json:"width"`
 }
 
 type GenerateCaptchaResponse struct {

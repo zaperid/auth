@@ -8,12 +8,12 @@ import (
 )
 
 type ChangePasswordRequest struct {
-	Token              string
-	CaptchaToken       string
-	CaptchaAnswer      string
-	OldPassword        string
-	NewPassword        string
-	NewPasswordConfirm string
+	Token              string `json:"token"`
+	CaptchaToken       string `json:"captcha_token"`
+	CaptchaAnswer      string `json:"captcha_answer"`
+	OldPassword        string `json:"old_password"`
+	NewPassword        string `json:"new_password"`
+	NewPasswordConfirm string `json:"new_password_confirm"`
 }
 
 type ChangePasswordResponse struct {
