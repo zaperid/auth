@@ -46,6 +46,7 @@ func (server *server_impl) setup() {
 
 	server.gin.POST("/api/v1/users", handler.RegisterHandler(server.endpoints.Register))
 	server.gin.PUT("/api/v1/users/password", handler.ChangePasswordHandler(server.endpoints.ChangePassword))
+	server.gin.GET("/api/v1/users/token", handler.RefreshTokenHandler(server.endpoints.RefreshToken))
 	server.gin.POST("/api/v1/users/token", handler.LoginHandler(server.endpoints.Login))
 	server.gin.GET("/api/v1/users/username", handler.UsedUsernameHandler(server.endpoints.UsedUsername))
 }

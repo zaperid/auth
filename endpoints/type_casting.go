@@ -10,4 +10,5 @@ type Endpoints struct {
 	UsedUsername    endpoint.Endpoint
 	Login           endpoint.Endpoint
 	ChangePassword  endpoint.Endpoint
+	RefreshToken    endpoint.Endpoint
 }

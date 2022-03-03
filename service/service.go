@@ -236,3 +236,20 @@ func (service *service_impl) ChangePassword(ctx context.Context, token string, c
 
 	return nil
 }
+
+func (service *service_impl) RefreshToken(oldToken string) (token string, err error) {
+	defer service.config.Logger.Info("refresh token", zap.String("execution time", executionTime(time.Now())))
+
+	jwtData, valid := service.jwt.Parse(oldToken)
+	if !valid {
+		return "", ErrTokenInvalid
+	}
+
+	token, err = service.jwt.Generate(jwtData)
+	if err != nil {
+		service.config.Logger.Error(err.Error())
+		return "", ErrGenerateToken
+	}
+
+	return token, nil
+}
