@@ -8,11 +8,11 @@ import (
 )
 
 type RegisterRequest struct {
-	CaptchaToken    string `json:"captcha_token"`
-	CaptchaAnswer   string `json:"captcha_answer"`
-	Username        string `json:"username"`
-	Password        string `json:"password"`
-	PasswordConfirm string `json:"password_confirm"`
+	CaptchaToken    string `json:"captcha_token" form:"captcha_token"`
+	CaptchaAnswer   string `json:"captcha_answer" form:"captcha_answer"`
+	Username        string `json:"username" form:"username"`
+	Password        string `json:"password" form:"password"`
+	PasswordConfirm string `json:"password_confirm" form:"password_confirm"`
 }
 
 type RegisterResponse struct {

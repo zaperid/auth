@@ -8,10 +8,10 @@ import (
 )
 
 type LoginRequest struct {
-	CaptchaToken  string `json:"captcha_token"`
-	CaptchaAnswer string `json:"captcha_answer"`
-	Username      string `json:"username"`
-	Password      string `json:"password"`
+	CaptchaToken  string `json:"captcha_token" form:"captcha_token"`
+	CaptchaAnswer string `json:"captcha_answer" form:"captcha_answer"`
+	Username      string `json:"username" form:"captcha_username"`
+	Password      string `json:"password" form:"capthca_answer"`
 }
 
 type LoginResponse struct {
