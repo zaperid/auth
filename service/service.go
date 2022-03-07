@@ -191,7 +191,7 @@ func (service *service_impl) Login(ctx context.Context, captchaToken string, cap
 	return tokenStr, nil
 }
 
-func (service *service_impl) ChangePassword(ctx context.Context, token string, captchaToken string, captcha string, oldPassword string, newPassword string, newPasswordConfirm string) (err error) {
+func (service *service_impl) ChangePassword(ctx context.Context, token string, captchaToken string, captcha string, currentPassword string, newPassword string, newPasswordConfirm string) (err error) {
 	defer service.config.Logger.Info("change user password", zap.String("execution time", executionTime(time.Now())))
 
 	jwtData, valid := service.jwt.Parse(token)
@@ -221,7 +221,7 @@ func (service *service_impl) ChangePassword(ctx context.Context, token string, c
 		return ErrFindData
 	}
 
-	if dbData.Password != hash.Hash([]byte(oldPassword)) {
+	if dbData.Password != hash.Hash([]byte(currentPassword)) {
 		return ErrOldPassword
 	}
 

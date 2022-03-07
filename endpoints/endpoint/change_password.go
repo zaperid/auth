@@ -11,7 +11,7 @@ type ChangePasswordRequest struct {
 	Token              string `json:"token" form:"token"`
 	CaptchaToken       string `json:"captcha_token" form:"captcha_token"`
 	CaptchaAnswer      string `json:"captcha_answer" form:"captcha_answer"`
-	OldPassword        string `json:"old_password" form:"old_password"`
+	CurrentPassword    string `json:"current_password" form:"current_password"`
 	NewPassword        string `json:"new_password" form:"new_password"`
 	NewPasswordConfirm string `json:"new_password_confirm" form:"new_password_confrim"`
 }
@@ -30,7 +30,7 @@ func ChangePasswordEndpoint(svc service.Service) endpoint.Endpoint {
 		}
 
 		var err error
-		err = svc.ChangePassword(ctx, req.Token, req.CaptchaToken, req.CaptchaAnswer, req.OldPassword, req.NewPassword, req.NewPasswordConfirm)
+		err = svc.ChangePassword(ctx, req.Token, req.CaptchaToken, req.CaptchaAnswer, req.CurrentPassword, req.NewPassword, req.NewPasswordConfirm)
 		if err != nil {
 			res.Error = err.Error()
 		}
