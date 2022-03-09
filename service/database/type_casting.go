@@ -39,10 +39,10 @@ type Data struct {
 }
 
 type DataFilter struct {
-	ID        bool `bson:"_id"`
-	Username  bool `bson:"username"`
-	Password  bool `bson:"password"`
-	Firstname bool `bson:"firstname"`
-	Lastname  bool `bson:"lastname"`
-	Email     bool `bson:"email"`
+	ID        bool `bson:"_id,omitempty"`
+	Username  bool `bson:"username,omitempty"`
+	Password  bool `bson:"password,omitempty"`
+	Firstname bool `bson:"firstname,omitempty"`
+	Lastname  bool `bson:"lastname,omitempty"`
+	Email     bool `bson:"email,omitempty"`
 }

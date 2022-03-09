@@ -145,7 +145,9 @@ func (service *service_impl) UsedUsername(ctx context.Context, username string) 
 		Username: username,
 	}
 
-	filter := database.DataFilter{}
+	filter := database.DataFilter{
+		ID: true,
+	}
 
 	err = service.db.Find(ctx, &data, filter)
 	if err == database.ErrorNotFound {
