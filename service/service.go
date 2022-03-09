@@ -291,3 +291,32 @@ func (service *service_impl) UpdateProfile(ctx context.Context, token string, fi
 	return nil
 
 }
+
+func (service *service_impl) GetProfile(ctx context.Context, token string) (firstname string, lastname string, email string, err error) {
+	defer service.config.Logger.Info("get user profile", zap.String("execution time", executionTime(time.Now())))
+
+	jwtData, valid := service.jwt.Parse(token)
+	if !valid {
+		return "", "", "", ErrTokenInvalid
+	}
+
+	var dbData database.Data
+
+	dbData.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
+	if err != nil {
+		service.config.Logger.Error(err.Error())
+		return "", "", "", ErrIDInvalid
+	}
+
+	err = service.db.Find(ctx, &dbData)
+	if err != nil {
+		service.config.Logger.Error(err.Error())
+		return "", "", "", ErrFindData
+	}
+
+	if err != nil {
+		return "", "", "", err
+	}
+
+	return dbData.Firstname, dbData.Lastname, dbData.Email, nil
+}

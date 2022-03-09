@@ -14,5 +14,6 @@ func NewEndpoints(svc service.Service) Endpoints {
 		ChangePassword:  endpoint.ChangePasswordEndpoint(svc),
 		RefreshToken:    endpoint.RefreshTokenEndpoint(svc),
 		UpdateProfile:   endpoint.UpdateProfileEndpoint(svc),
+		GetProfile:      endpoint.GetProfileEndpoint(svc),
 	}
 }
