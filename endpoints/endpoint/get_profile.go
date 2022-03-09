@@ -8,7 +8,10 @@ import (
 )
 
 type GetProfileRequest struct {
-	Token string `json:"token" form:"token"`
+	Token     string `json:"token" form:"token"`
+	Firstname bool   `json:"firstname,omitempty" form:"firstname,omitempty"`
+	Lastname  bool   `json:"lastname,omitempty" form:"lastname,omitempty"`
+	Email     bool   `json:"email,omitempty" form:"email,omitempty"`
 }
 
 type GetProfileResponse struct {
@@ -27,10 +30,23 @@ func GetProfileEndpoint(svc service.Service) endpoint.Endpoint {
 			return res, ErrInvalidRequest
 		}
 
+		filter := service.ProfileFilter{
+			Firstname: req.Firstname,
+			Lastname:  req.Lastname,
+			Email:     req.Email,
+		}
+
 		var err error
-		res.Firstname, res.Lastname, res.Email, err = svc.GetProfile(ctx, req.Token)
+		var profile service.Profile
+		profile, err = svc.GetProfile(ctx, req.Token, filter)
 		if err != nil {
 			res.Error = err.Error()
+		}
+
+		{
+			res.Firstname = profile.Firstname
+			res.Lastname = profile.Lastname
+			res.Email = profile.Lastname
 		}
 
 		return res, nil

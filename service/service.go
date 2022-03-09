@@ -314,12 +314,12 @@ func (service *service_impl) UpdateProfile(ctx context.Context, token string, fi
 
 }
 
-func (service *service_impl) GetProfile(ctx context.Context, token string) (firstname string, lastname string, email string, err error) {
+func (service *service_impl) GetProfile(ctx context.Context, token string, filter ProfileFilter) (profile Profile, err error) {
 	defer service.config.Logger.Info("get user profile", zap.String("execution time", executionTime(time.Now())))
 
 	jwtData, valid := service.jwt.Parse(token)
 	if !valid {
-		return "", "", "", ErrTokenInvalid
+		return Profile{}, ErrTokenInvalid
 	}
 
 	var data database.Data
@@ -327,25 +327,31 @@ func (service *service_impl) GetProfile(ctx context.Context, token string) (firs
 		data.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
 		if err != nil {
 			service.config.Logger.Error(err.Error())
-			return "", "", "", ErrIDInvalid
+			return Profile{}, ErrIDInvalid
 		}
 	}
 
-	filter := database.DataFilter{
-		Firstname: true,
-		Lastname:  true,
-		Email:     true,
+	dataFilter := database.DataFilter{
+		Firstname: filter.Firstname,
+		Lastname:  filter.Lastname,
+		Email:     filter.Email,
 	}
 
-	err = service.db.Find(ctx, &data, filter)
+	err = service.db.Find(ctx, &data, dataFilter)
 	if err != nil {
 		service.config.Logger.Error(err.Error())
-		return "", "", "", ErrFindData
+		return Profile{}, ErrFindData
 	}
 
 	if err != nil {
-		return "", "", "", err
+		return Profile{}, err
 	}
 
-	return data.Firstname, data.Lastname, data.Email, nil
+	{
+		profile.Firstname = data.Firstname
+		profile.Lastname = data.Lastname
+		profile.Email = data.Email
+	}
+
+	return profile, nil
 }

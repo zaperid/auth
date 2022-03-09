@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"montrek-auth/endpoints/endpoint"
 	"net/http"
 
@@ -17,6 +18,8 @@ func GetProfile(endpointfn gokitEndpoint.Endpoint) gin.HandlerFunc {
 		} else if c.BindQuery(&req) != nil {
 			return
 		}
+
+		fmt.Println(req)
 
 		var res endpoint.GetProfileResponse
 		{

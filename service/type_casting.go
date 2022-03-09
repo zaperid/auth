@@ -36,7 +36,7 @@ type Service interface {
 	ChangePassword(ctx context.Context, token string, captchaToken string, captchaAnswer string, currentPassword string, newPassword string, newPasswordConfirm string) (err error)
 	RefreshToken(oldToken string) (token string, err error)
 	UpdateProfile(ctx context.Context, token string, firstname string, lastname string, email string) (err error)
-	GetProfile(ctx context.Context, token string) (firstname string, lastname string, email string, err error)
+	GetProfile(ctx context.Context, token string, filter ProfileFilter) (profile Profile, err error)
 }
 
 type Config struct {
@@ -50,4 +50,16 @@ type Config struct {
 	CaptchaShowline   int
 	CaptchaLength     int
 	JWTLifetime       time.Duration
+}
+
+type Profile struct {
+	Firstname string
+	Lastname  string
+	Email     string
+}
+
+type ProfileFilter struct {
+	Firstname bool
+	Lastname  bool
+	Email     bool
 }
