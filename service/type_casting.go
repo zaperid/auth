@@ -35,6 +35,7 @@ type Service interface {
 	Login(ctx context.Context, captchaToken string, captchaAnswer string, username string, password string) (token string, err error)
 	ChangePassword(ctx context.Context, token string, captchaToken string, captchaAnswer string, currentPassword string, newPassword string, newPasswordConfirm string) (err error)
 	RefreshToken(oldToken string) (token string, err error)
+	UpdateProfile(ctx context.Context, token string, firstname string, lastname string, email string) (err error)
 }
 
 type Config struct {

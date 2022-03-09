@@ -253,3 +253,41 @@ func (service *service_impl) RefreshToken(oldToken string) (token string, err er
 
 	return token, nil
 }
+
+func (service *service_impl) UpdateProfile(ctx context.Context, token string, firstname string, lastname string, email string) (err error) {
+	defer service.config.Logger.Info("update user profile", zap.String("execution time", executionTime(time.Now())))
+
+	jwtData, valid := service.jwt.Parse(token)
+	if !valid {
+		return ErrTokenInvalid
+	}
+
+	var dbData database.Data
+
+	dbData.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
+	if err != nil {
+		service.config.Logger.Error(err.Error())
+		return ErrIDInvalid
+	}
+
+	err = service.db.Find(ctx, &dbData)
+	if err != nil {
+		service.config.Logger.Error(err.Error())
+		return ErrFindData
+	}
+
+	err = service.db.Update(ctx, database.Data{
+		ID:        dbData.ID,
+		Firstname: firstname,
+		Lastname:  lastname,
+		Email:     email,
+	})
+
+	if err != nil {
+		service.config.Logger.Error(err.Error())
+		return ErrUpdateData
+	}
+
+	return nil
+
+}

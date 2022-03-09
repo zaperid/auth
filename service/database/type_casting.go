@@ -30,7 +30,10 @@ type Database interface {
 }
 
 type Data struct {
-	ID       primitive.ObjectID `bson:"_id,omitempty"`
-	Username string             `bson:"username,omitempty"`
-	Password string             `bson:"password,omitempty"`
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
+	Username  string             `bson:"username,omitempty"`
+	Password  string             `bson:"password,omitempty"`
+	Firstname string             `bson:"firstname,omitempty"`
+	Lastname  string             `bson:"lastname,omitempty"`
+	Email     string             `bson:"email,omitempty"`
 }

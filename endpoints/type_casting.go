@@ -11,4 +11,5 @@ type Endpoints struct {
 	Login           endpoint.Endpoint
 	ChangePassword  endpoint.Endpoint
 	RefreshToken    endpoint.Endpoint
+	UpdateProfile   endpoint.Endpoint
 }
