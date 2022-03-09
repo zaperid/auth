@@ -4,7 +4,6 @@ package database_test
 
 import (
 	"context"
-	"fmt"
 	"montrek-auth/service/database"
 	"testing"
 
@@ -46,9 +45,7 @@ func TestFind(t *testing.T) {
 	data := database.Data{}
 
 	dataFilter := database.DataFilter{
-		ID:       true,
 		Username: true,
-		Password: true,
 	}
 
 	err = db.Find(ctx, &data, dataFilter)
@@ -56,7 +53,13 @@ func TestFind(t *testing.T) {
 		return
 	}
 
-	fmt.Println(data)
+	if !assert.NotEmpty(t, data.Username) {
+		return
+	}
+
+	if !assert.Empty(t, data.Password) {
+		return
+	}
 
 	err = db.Disconnect(ctx)
 	if !assert.Nil(t, err) {
