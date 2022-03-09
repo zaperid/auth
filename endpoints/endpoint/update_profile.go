@@ -27,8 +27,15 @@ func UpdateProfileEndpoint(svc service.Service) endpoint.Endpoint {
 			return res, ErrInvalidRequest
 		}
 
+		var profile service.Profile
+		{
+			profile.Firstname = req.Firstname
+			profile.Lastname = req.Lastname
+			profile.Email = req.Email
+		}
+
 		var err error
-		err = svc.UpdateProfile(ctx, req.Token, req.Firstname, req.Lastname, req.Email)
+		err = svc.UpdateProfile(ctx, req.Token, profile)
 		if err != nil {
 			res.Error = err.Error()
 		}

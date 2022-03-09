@@ -271,7 +271,7 @@ func (service *service_impl) RefreshToken(oldToken string) (token string, err er
 	return token, nil
 }
 
-func (service *service_impl) UpdateProfile(ctx context.Context, token string, firstname string, lastname string, email string) (err error) {
+func (service *service_impl) UpdateProfile(ctx context.Context, token string, profile Profile) (err error) {
 	defer service.config.Logger.Info("update user profile", zap.String("execution time", executionTime(time.Now())))
 
 	jwtData, valid := service.jwt.Parse(token)
@@ -300,9 +300,9 @@ func (service *service_impl) UpdateProfile(ctx context.Context, token string, fi
 
 	err = service.db.Update(ctx, database.Data{
 		ID:        data.ID,
-		Firstname: firstname,
-		Lastname:  lastname,
-		Email:     email,
+		Firstname: profile.Firstname,
+		Lastname:  profile.Lastname,
+		Email:     profile.Email,
 	})
 
 	if err != nil {
