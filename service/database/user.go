@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 )
 
@@ -36,7 +37,7 @@ func (database *database_impl) Insert(ctx context.Context, data *Data) error {
 	return nil
 }
 
-func (database *database_impl) Find(ctx context.Context, data *Data) error {
+func (database *database_impl) Find(ctx context.Context, data *Data, filter DataFilter) error {
 	database.config.Logger.Info("find data")
 	database.config.Logger.Debug("finding data", zap.Any("data", data))
 
@@ -44,7 +45,14 @@ func (database *database_impl) Find(ctx context.Context, data *Data) error {
 		return ErrorDisconnected
 	}
 
-	result := database.col.FindOne(ctx, data)
+	var option options.FindOneOptions
+	{
+		option.SetProjection(
+			filter,
+		)
+	}
+
+	result := database.col.FindOne(ctx, data, &option)
 	err := result.Decode(data)
 	if err != nil {
 		switch err {

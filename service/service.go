@@ -145,7 +145,9 @@ func (service *service_impl) UsedUsername(ctx context.Context, username string) 
 		Username: username,
 	}
 
-	err = service.db.Find(ctx, &data)
+	filter := database.DataFilter{}
+
+	err = service.db.Find(ctx, &data, filter)
 	if err == database.ErrorNotFound {
 		return false, nil
 	}
@@ -168,7 +170,12 @@ func (service *service_impl) Login(ctx context.Context, captchaToken string, cap
 		Username: username,
 	}
 
-	err = service.db.Find(ctx, &data)
+	filter := database.DataFilter{
+		ID:       true,
+		Password: true,
+	}
+
+	err = service.db.Find(ctx, &data, filter)
 	if err != nil {
 		service.config.Logger.Error(err.Error())
 		return "", ErrFindData
@@ -207,28 +214,36 @@ func (service *service_impl) ChangePassword(ctx context.Context, token string, c
 		return ErrPassNotConfirm
 	}
 
-	var dbData database.Data
-
-	dbData.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
-	if err != nil {
-		service.config.Logger.Error(err.Error())
-		return ErrIDInvalid
+	var data database.Data
+	{
+		data.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
+		if err != nil {
+			service.config.Logger.Error(err.Error())
+			return ErrIDInvalid
+		}
 	}
 
-	err = service.db.Find(ctx, &dbData)
+	filter := database.DataFilter{
+		ID:       true,
+		Password: true,
+	}
+
+	err = service.db.Find(ctx, &data, filter)
 	if err != nil {
 		service.config.Logger.Error(err.Error())
 		return ErrFindData
 	}
 
-	if dbData.Password != hash.Hash([]byte(currentPassword)) {
+	if data.Password != hash.Hash([]byte(currentPassword)) {
 		return ErrOldPassword
 	}
 
-	err = service.db.Update(ctx, database.Data{
-		ID:       dbData.ID,
-		Password: hash.Hash([]byte(newPassword)),
-	})
+	{
+		data.Username = ""
+		data.Password = hash.Hash([]byte(newPassword))
+	}
+
+	err = service.db.Update(ctx, data)
 	if err != nil {
 		service.config.Logger.Error(err.Error())
 		return ErrUpdateData
@@ -262,22 +277,27 @@ func (service *service_impl) UpdateProfile(ctx context.Context, token string, fi
 		return ErrTokenInvalid
 	}
 
-	var dbData database.Data
-
-	dbData.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
-	if err != nil {
-		service.config.Logger.Error(err.Error())
-		return ErrIDInvalid
+	var data database.Data
+	{
+		data.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
+		if err != nil {
+			service.config.Logger.Error(err.Error())
+			return ErrIDInvalid
+		}
 	}
 
-	err = service.db.Find(ctx, &dbData)
+	filter := database.DataFilter{
+		ID: true,
+	}
+
+	err = service.db.Find(ctx, &data, filter)
 	if err != nil {
 		service.config.Logger.Error(err.Error())
 		return ErrFindData
 	}
 
 	err = service.db.Update(ctx, database.Data{
-		ID:        dbData.ID,
+		ID:        data.ID,
 		Firstname: firstname,
 		Lastname:  lastname,
 		Email:     email,
@@ -300,15 +320,22 @@ func (service *service_impl) GetProfile(ctx context.Context, token string) (firs
 		return "", "", "", ErrTokenInvalid
 	}
 
-	var dbData database.Data
-
-	dbData.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
-	if err != nil {
-		service.config.Logger.Error(err.Error())
-		return "", "", "", ErrIDInvalid
+	var data database.Data
+	{
+		data.ID, err = primitive.ObjectIDFromHex(jwtData.ID)
+		if err != nil {
+			service.config.Logger.Error(err.Error())
+			return "", "", "", ErrIDInvalid
+		}
 	}
 
-	err = service.db.Find(ctx, &dbData)
+	filter := database.DataFilter{
+		Firstname: true,
+		Lastname:  true,
+		Email:     true,
+	}
+
+	err = service.db.Find(ctx, &data, filter)
 	if err != nil {
 		service.config.Logger.Error(err.Error())
 		return "", "", "", ErrFindData
@@ -318,5 +345,5 @@ func (service *service_impl) GetProfile(ctx context.Context, token string) (firs
 		return "", "", "", err
 	}
 
-	return dbData.Firstname, dbData.Lastname, dbData.Email, nil
+	return data.Firstname, data.Lastname, data.Email, nil
 }

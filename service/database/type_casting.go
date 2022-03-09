@@ -25,7 +25,7 @@ type Database interface {
 	Connect(ctx context.Context) error
 	Disconnect(ctx context.Context) error
 	Insert(ctx context.Context, data *Data) error
-	Find(ctx context.Context, data *Data) error
+	Find(ctx context.Context, data *Data, filter DataFilter) error
 	Update(ctx context.Context, data Data) error
 }
 
@@ -36,4 +36,13 @@ type Data struct {
 	Firstname string             `bson:"firstname,omitempty"`
 	Lastname  string             `bson:"lastname,omitempty"`
 	Email     string             `bson:"email,omitempty"`
+}
+
+type DataFilter struct {
+	ID        bool `bson:"_id"`
+	Username  bool `bson:"username"`
+	Password  bool `bson:"password"`
+	Firstname bool `bson:"firstname"`
+	Lastname  bool `bson:"lastname"`
+	Email     bool `bson:"email"`
 }

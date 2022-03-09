@@ -4,6 +4,7 @@ package database_test
 
 import (
 	"context"
+	"fmt"
 	"montrek-auth/service/database"
 	"testing"
 
@@ -26,6 +27,36 @@ func TestConnection(t *testing.T) {
 	if !assert.Nil(t, err) {
 		return
 	}
+
+	err = db.Disconnect(ctx)
+	if !assert.Nil(t, err) {
+		return
+	}
+}
+
+func TestFind(t *testing.T) {
+	ctx := context.Background()
+
+	db := database.NewDatabase(config)
+	err := db.Connect(ctx)
+	if !assert.Nil(t, err) {
+		return
+	}
+
+	data := database.Data{}
+
+	dataFilter := database.DataFilter{
+		ID:       true,
+		Username: true,
+		Password: true,
+	}
+
+	err = db.Find(ctx, &data, dataFilter)
+	if !assert.Nil(t, err) {
+		return
+	}
+
+	fmt.Println(data)
 
 	err = db.Disconnect(ctx)
 	if !assert.Nil(t, err) {
