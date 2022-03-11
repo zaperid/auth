@@ -23,7 +23,7 @@ var (
 	ErrGenerateToken        = errors.New("unable to generate jwt")
 	ErrTokenInvalid         = errors.New("token invalid")
 	ErrIDInvalid            = errors.New("error ID invalid")
-	ErrOldPassword          = errors.New("old password does not match")
+	ErrOldPassword          = errors.New("current password does not match")
 	ErrUpdateData           = errors.New("unable to update data to database")
 )
 
