@@ -46,7 +46,7 @@ func GetProfileEndpoint(svc service.Service) endpoint.Endpoint {
 		{
 			res.Firstname = profile.Firstname
 			res.Lastname = profile.Lastname
-			res.Email = profile.Lastname
+			res.Email = profile.Email
 		}
 
 		return res, nil
