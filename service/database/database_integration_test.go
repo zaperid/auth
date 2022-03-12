@@ -4,7 +4,7 @@ package database_test
 
 import (
 	"context"
-	"montrek-auth/service/database"
+	"github.com/zaperid/auth/service/database"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

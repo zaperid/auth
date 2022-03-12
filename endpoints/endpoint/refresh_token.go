@@ -2,7 +2,7 @@ package endpoint
 
 import (
 	"context"
-	"montrek-auth/service"
+	"github.com/zaperid/auth/service"
 
 	"github.com/go-kit/kit/endpoint"
 )

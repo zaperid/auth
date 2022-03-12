@@ -1,8 +1,8 @@
 package endpoints
 
 import (
-	"montrek-auth/endpoints/endpoint"
-	"montrek-auth/service"
+	"github.com/zaperid/auth/endpoints/endpoint"
+	"github.com/zaperid/auth/service"
 )
 
 func NewEndpoints(svc service.Service) Endpoints {

@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"montrek-auth/service/captcha"
-	"montrek-auth/service/database"
-	"montrek-auth/service/hash"
-	"montrek-auth/service/jwt"
+	"github.com/zaperid/auth/service/captcha"
+	"github.com/zaperid/auth/service/database"
+	"github.com/zaperid/auth/service/hash"
+	"github.com/zaperid/auth/service/jwt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"

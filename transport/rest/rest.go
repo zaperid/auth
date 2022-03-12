@@ -2,8 +2,8 @@ package rest
 
 import (
 	"fmt"
-	"montrek-auth/endpoints"
-	"montrek-auth/transport/rest/handler"
+	"github.com/zaperid/auth/endpoints"
+	"github.com/zaperid/auth/transport/rest/handler"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

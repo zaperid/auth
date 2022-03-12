@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"montrek-auth/endpoints/endpoint"
+	"github.com/zaperid/auth/endpoints/endpoint"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
